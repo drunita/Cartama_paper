@@ -1,0 +1,5 @@
+SampleID	Farm	Severity	Lenticel_disease_status
+Sinai_Severo	Sinai_Severo	25.9	Necrotic
+Sinai_Leve	Sinai_Leve	1.7	Healthy
+Escondida_Severo	Escondida_Severo	0.7	Necrotic
+Escondida_Leve	Escondida_Leve	0.29	Healthy
