@@ -1,0 +1,406 @@
+---
+title: "Paper_Cartama_Microbial_ecology"
+author: "dru"
+date: "2/16/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Preparing the environment
+
+Loading required Packages
+
+```{r Packages}
+
+library(tidyverse)
+library(gridExtra)
+library(tibble)
+library(ggplot2)
+library(extrafont)
+loadfonts(device = "win")
+library(phyloseq)
+library(scales)   
+library(ggpubr)
+library(readxl)
+library(vegan)
+library(biomformat)
+
+
+```
+
+## Lenticel damage the fruits
+
+Generating the dataframe containing the lenticel damage data for the differentialy diseased fruits used inthe microbial ecology annalisis
+
+
+```{r data}
+
+md <- data.frame("Severity"=c(.7 , .84 , 1.66 , 1.66 ,0.62 , 2.02 , 0.085 , 0.025 , 0.08 ,
+                              0.085 ,0.095 , 0.285 , 23.4 , 17.97 , 15.99 , 19.13 , 19.01,
+                              12.92 , 1.73 , 0.18 , 0.81 , 1.15 , 0.47 , 0.09),
+                 "Incidence"=c(50 , 84 , 89 , 133 , 84 , 158 , 11 , 5 , 12 ,30 , 14 , 31 ,
+                               525 , 488 , 347 , 269 , 358 , 515 , 128 , 62 ,119 , 94 ,
+                               108 , 68),
+                 "Farm"= c(rep("Escondida" , 12) , rep("Siani" , 12)),
+                 "Damage"= c(rep(c(rep("Severe" , 6) , rep("Mild" , 6)),2))) 
+
+head(md)
+
+```
+Ploting the severity data:
+
+```{r severity plot}
+
+p <-  ggplot(md, aes(x = Damage, y = Severity)) + 
+      geom_bar(stat="summary", color="black", position=position_dodge(),
+               fill=rep(c("gray90","gray70"),2),fun = mean) +
+      stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar", color="black", width=0.2)
+p <- p + geom_jitter()+ facet_wrap(~Farm) + theme_classic() 
+p <- p +  xlab("") + ylab("Necrotic Area (%)")+ylim(c(0, max(md$Severity)*1.2))
+p <- p + theme(axis.title =element_text(size=14,family = 'serif'))
+p <- p +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
+              axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
+p <- p + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+
+p <- p +     geom_signif(test="t.test", comparisons = list(c("Severe", "Mild")), map_signif_level = T)
+
+```
+Ploting the incidence data:
+
+```{r incidence plot}
+
+p1 <-  ggplot(md, aes(x = Damage, y = Incidence)) + 
+      geom_bar(stat="summary", color="black", position=position_dodge(),
+               fill=rep(c("gray90","gray70"),2),fun = mean) +
+      stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar", color="black", width=0.2) 
+p1 <- p1 + geom_jitter()+ facet_wrap(~Farm) + theme_classic() 
+p1 <- p1 +  xlab("") + ylab("Necrotic spots")+ylim(c(0, max(md$Incidence)*1.2))
+p1 <- p1 + theme(axis.title =element_text(size=14,family = 'serif'))
+p1 <- p1 +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
+              axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
+p1 <- p1 + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+p1 <- p1 +     geom_signif(test="t.test", comparisons = list(c("Severe", "Mild")), map_signif_level = T)
+```
+*Supplementary figure 3.* Lenticel damage for avocado cv. Hass fruits used for the microbial-community analysis. Fruits were collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Shown are the means and standard deviations for the severity (A) and incidence (B) of the damage for the fruits with deferent levels of affection. The points show the severity and incidence for the fruits and the asterisk denote statistic differences at the 99.0% () and 99.9% () confidence level according to the t test (n: 6).
+
+
+```{r severity and incidence plot}
+
+ plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
+```
+
+## Alpha diversity plot
+
+Loading the dataframe containing the alpha diversity metrics for the for the differentialy diseased fruits
+
+```{r alfa df}
+Alfa <- read_excel("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/Alfa/Alfa.xlsx")
+head(Alfa)
+```
+Ploting the alpha_diversity metrics
+
+```{r alpha-diversity plots}
+
+#### Chao
+
+c <-  ggplot(Alfa, aes(x = Damage_level, y = Chao)) + 
+      geom_bar(stat="summary", color="black", position=position_dodge(),
+               fill=rep(c("gray90","gray70"),2),fun = mean) +
+      stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar",
+                   color="black", width=0.2) 
+c <- c + geom_jitter()+ facet_wrap(~Farm)+ theme_classic() 
+c <- c +  xlab("") + ylab("Chao")+ylim(c(0, max(Alfa$Chao)*1.1))
+c <- c + theme(axis.title =element_text(size=14,family = 'serif'))
+c <- c +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,
+                                             family ='serif'),
+                  axis.text.y = element_text(face="bold",size=12, angle=0,family =
+                                               'serif'))
+c <- c + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+c <- c + geom_signif(test="t.test", comparisons = list(c("Mild", "Severe")), map_signif_level = T)
+
+#### Shannon_entropy
+
+s <-  ggplot(Alfa, aes(x = Damage_level, y = Shannon_entropy)) + 
+      geom_bar(stat="summary", color="black", position=position_dodge(),
+               fill=rep(c("gray90","gray70"),2),fun = mean) +
+      stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar",
+                   color="black", width=0.2) 
+s <- s + geom_jitter()+ facet_wrap(~Farm)+ theme_classic() 
+s <- s +  xlab("") + ylab("Shannon entropy")+ylim(c(0, max(Alfa$Shannon_entropy)*1.1))
+s <- s + theme(axis.title =element_text(size=14,family = 'serif'))
+s <- s +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,
+                                             family ='serif'),
+                  axis.text.y = element_text(face="bold",size=12, angle=0,family =
+                                               'serif'))
+s <- s + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+s <- s + geom_signif(test="t.test", comparisons = list(c("Mild", "Severe")), map_signif_level = T)
+
+#### Riqueza
+
+r <-  ggplot(Alfa, aes(x = Damage_level, y = Riqueza)) + 
+      geom_bar(stat="summary", color="black", position=position_dodge(),
+               fill=rep(c("gray90","gray70"),2),fun = mean) +
+      stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar",
+                   color="black", width=0.2) 
+r <- r + geom_jitter()+ facet_wrap(~Farm)+ theme_classic() 
+r <- r +  xlab("") + ylab("Richness")+ylim(c(0, max(Alfa$Riqueza)*1.1))
+r <- r + theme(axis.title =element_text(size=14,family = 'serif'))
+r <- r +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,
+                                             family ='serif'),
+                  axis.text.y = element_text(face="bold",size=12, angle=0,family =
+                                               'serif'))
+r <- r + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+r <- r + geom_signif(test="t.test", comparisons = list(c("Mild", "Severe")), map_signif_level = T)
+
+#### Faith_pd
+
+f <-  ggplot(Alfa, aes(x = Damage_level, y = Faith_pd)) + 
+      geom_bar(stat="summary", color="black", position=position_dodge(),
+               fill=rep(c("gray90","gray70"),2),fun = mean) +
+      stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar",
+                   color="black", width=0.2) 
+f <- f + geom_jitter()+ facet_wrap(~Farm)+ theme_classic() 
+f <- f +  xlab("") + ylab("Faith pd")+ylim(c(0, max(Alfa$Faith_pd)*1.1))
+f <- f + theme(axis.title =element_text(size=14,family = 'serif'))
+f <- f +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,
+                                             family ='serif'),
+                  axis.text.y = element_text(face="bold",size=12, angle=0,family =
+                                               'serif'))
+f <- f + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+f <- f + geom_signif(test="t.test", comparisons = list(c("Mild", "Severe")), map_signif_level = T)
+
+```
+
+*Figure 3.* Alfa diversity for the fungal communities of the avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Shown are the means and standard deviations for the alfa diversity index richness (A), Shannon (B), and Faith (C) alpha-diversity and the asterisk denote statistic differences at the 99.0% () and 99.9% () confidence level according to the t test (n: 6).
+
+```{r severity and incidence plot}
+
+ alpha_plot<-grid.arrange(r + labs(tag = 'A'),s + labs(tag = 'B'), f + labs(tag = 'C'), ncol=3,nrow=1)
+```
+
+## Beta diversity plots
+Loading the ASVs table after CCS normalization and the phylogenetic tree for the Beta diversity annalysis
+
+```{r uploading the CCS.biom and tree.nwk}
+biomfile <- import_biom("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/css_eff.biom")
+biomfile_mapfile <- import_qiime_sample_data("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/metadata_real.txt")
+biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
+colnames(tax_table(biomfile_merged)) <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+sam <-sample_data(biomfile_merged)
+
+otu.table <- otu_table(biomfile_merged)
+taxa <- tax_table(biomfile_merged)
+
+tree <- read_tree("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/tree.nwk")
+
+otutax = phyloseq(otu.table, taxa)
+merge2 = merge_phyloseq(otutax, sam, tree)
+```
+
+###PCoA
+
+```{r PCoA}
+
+example.ord <- ordinate(merge2, "PCoA", "Unifrac", weighted=TRUE)
+
+PCoA<- plot_ordination(merge2, example.ord, type = "sites", color = "Farm", label = NULL)
+PCoA = PCoA  + 
+  geom_point(aes(color =Farm,shape = Farm1), size = 3) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        rect = element_rect(fill = "white", colour = "black",size = 0.5, linetype = 1),
+        axis.ticks = element_line(colour = "black"),
+        axis.title.x = element_text(face="plain",family = "serif", colour="black", size=12),
+        axis.title.y = element_text(face="plain",family = "serif", colour="black", size=12),
+        axis.text.x  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=10),
+        axis.text.y  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=10),
+        panel.background = element_rect(fill = "white", colour = "black", linetype = 1, size = 0.5),
+        panel.border = element_blank(), legend.title = element_blank(), legend.text=element_text(size=11,family = "serif"), plot.margin = margin(1, 0.6, 1, 1, "cm"))  +
+  scale_colour_manual(values=c("gray85","gray65","gray85","gray65"),labels = c("Escondida_Mild","Escondida_Severe", "Sinai_Mild","Sinai_Severe"))+  
+  stat_ellipse(type = "t", size=0.5) + theme(legend.position = "bottom") +
+  labs(x = "PCoA (60.4%)", y= "PCoA (12.2%)")
+legend <- get_legend(PCoA)
+PCoA <- PCoA + theme(legend.position="none")
+
+```
+
+###CAP
+
+```{r CAP}
+agricultural.ord<- ordinate(merge2, "CAP", "wunifrac", ~Farm)
+
+agricultural_plot<- plot_ordination(merge2, agricultural.ord, type = "sites",
+                                    color = "Farm",
+                                    title = "", label = NULL)
+
+CAP = agricultural_plot  +
+  geom_point(aes(color =Farm,shape = Farm1), size = 3) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        rect = element_rect(fill = "white", colour = "black",size = 0.5, linetype = 1),
+        axis.ticks = element_line(colour = "black"),
+        axis.title.x = element_text(face="plain",family = "serif", colour="black", size=12),
+        axis.title.y = element_text(face="plain",family = "serif", colour="black", size=12),
+        axis.text.x  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=10),
+        axis.text.y  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=10),
+        panel.background = element_rect(fill = "white", colour = "black", linetype = 1, size = 0.5),
+        panel.border = element_blank(), legend.title = element_blank(), legend.text=element_text(size=11,family = "serif"), plot.margin = margin(0.71, 1, 1, 0.6, "cm"))  +
+  scale_colour_manual(values=c("gray85","gray65","gray85","gray65"),labels =
+                        c("Escondida_Mild","Escondida_Severe",
+                          "Sinai_Mild","Sinai_Severe")) + 
+  stat_ellipse(type = "t", size=0.5) + labs(x = "CAP (23.7%)", y= "CAP (45.8%)")+theme(legend.position = "none")
+
+
+```
+*Fig 4.* Fungal communities’ structure for fruits of avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Cumulative sum scaling (CSS) transformed reads were used to calculate weighted unifrac distance. Shown are the bidimensional planes of the principal coordinates analysis (PCoA) (72.6 % of the overall variance) (A) and canonical analysis of principal coordinates (CAP) constrained by the farm (La Escondida and El Sinai) (68.8 % of the overall variance; p-value: 0.001) (B). Each point represents the fungal community of a fruit, and the colors show the origin (La Escondida o El Sinai) and damage severity (Severe or Mild) of the fruit. The ellipsis are the 95 % confidence level ellipses.
+
+```{r PCoA and PCA plots}
+
+po<-grid.arrange(PCoA+labs(tag = "A"),CAP+labs(tag = "B"),legend, ncol=2,nrow = 2, 
+             layout_matrix = rbind(c(1,2), c(3,3)),
+             widths = c(2.7, 2.7), heights = c(2.5, 0.2))
+```
+## Taxonomy bat plots
+Loading the ASVs table 
+
+
+```{r data barplot}
+biomfile <- import_biom("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/ASVs_table9_dada2R.biom")
+biomfile_mapfile <- import_qiime_sample_data("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/metadata_real.txt")
+biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
+colnames(tax_table(biomfile_merged)) <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+#sample_data(biomfile_merged)
+
+plot_colors <- c( "palegoldenrod","gray90", "plum4", "lightsteelblue","darkseagreen1",
+                   "darkseagreen4","deepskyblue1","gray50" , "yellow2", "slateblue1",
+                   "#CBD588", "#5F7FC7","#DA5724", "#508578", "#CD9BCD", "#AD6F3B",
+                   "#673770","Khaki4", "#652926", "yellow3", "cadetblue3",
+                   "lightsteelblue3", "honeydew3", "gray80","thistle4","yellow4",
+                   "#5E738F", "#8A7C64","gray30", "lightpink3")
+```
+
+
+## Phylum barplot
+
+```{r}
+subset = biomfile_merged
+rel.abun = transform_sample_counts(subset, function(x) x / sum(x))
+glom <- tax_glom(rel.abun, taxrank = 'Phylum')
+data_glom<- psmelt(glom) 
+data_glom$Phylum <- as.character(data_glom$Phylum) 
+data_glom$Phylum[data_glom$Abundance < 0.03] <- "< 3% abundancia"
+data_glom$Phylum[data_glom$Phylum == "unidentified"] <- "Not classified"
+data_glom$Phylum[data_glom$Phylum == "undefined"] <-"Not classified"
+
+
+p1 <- ggplot(data_glom, aes(x = Lenticel_disease_status, y = Abundance/6, fill = reorder(Phylum, Abundance)))+
+  geom_bar(stat = "identity") + facet_wrap(~Farm1) + scale_fill_manual(values =plot_colors) +
+  ylab("Relative abundance") + xlab("") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        rect = element_rect(fill = "white",  colour = "black",  size = 0.5, linetype = 1),
+        axis.line = element_line(colour = "black"),
+        axis.ticks = element_line(colour = "black"),
+        axis.title.y = element_text(face="plain", colour="black", size=14,family="serif"),
+        axis.text.x  = element_text(face="plain", colour = "black", angle=30, vjust=0.6, size=10,family="serif"),
+        axis.text.y  = element_text(face="plain",colour = "black", angle=360, vjust=0.5, size=10,family="serif"),
+        panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
+        panel.border = element_blank()) + scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  theme(legend.title = element_blank(),legend.text = element_text(family="serif",size=10)) + 
+  theme(strip.text.x = element_text(size = 12 , family = 'serif')) 
+
+
+```
+
+
+```{r Barplot Ascomycota }
+
+subset = subset_taxa(biomfile_merged, Phylum == "Ascomycota")
+
+
+rel.abun = transform_sample_counts(subset, function(x) x / sum(x) )
+glom <- tax_glom(rel.abun, taxrank = 'Genus')
+data_glom<- psmelt(glom)
+data_glom$Genus <- as.character(data_glom$Genus) 
+
+
+data_glom$Genus[data_glom$Abundance < 0.03] <- "< 3% abundancia"
+data_glom$Genus[data_glom$Genus == "unidentified"] <- "Not classified"
+data_glom$Genus[data_glom$Genus == "undefined"] <-"Not classified"
+
+  
+p2<-ggplot(data_glom, aes(x = Lenticel_disease_status, y = Abundance/6, fill = reorder(Genus, Abundance)))+
+  geom_bar(stat = "identity") + facet_wrap(~Farm1) + scale_fill_manual(values =plot_colors, name ="Genus") +
+  ylab("Relative abundance") + xlab("") +
+   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        rect = element_rect(fill = "white",  colour = "black",  size = 0.5, linetype = 1),
+        axis.line = element_line(colour = "black"),
+        axis.ticks = element_line(colour = "black"),
+        axis.title.y = element_text(face="plain", colour="black", size=14,family="serif"),
+        axis.text.x  = element_text(face="plain", colour = "black", angle=30, vjust=0.6, size=10,family="serif"),
+        axis.text.y  = element_text(face="plain",colour = "black", angle=360, vjust=0.5, size=10,family="serif"),
+        panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
+        panel.border = element_blank()) + scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  theme(legend.title = element_text(family="serif",size=12),legend.text = element_text(family="serif",size=10)) +
+  theme(strip.text.x = element_text(size = 12 , family = 'serif')) 
+
+
+```
+
+```{r Basidiomycota}
+subset = subset_taxa(biomfile_merged, Phylum == "Basidiomycota")
+
+
+rel.abun = transform_sample_counts(subset, function(x) x / sum(x) )
+glom <- tax_glom(rel.abun, taxrank = 'Genus')
+data_glom<- psmelt(glom)
+data_glom$Genus <- as.character(data_glom$Genus) 
+
+
+data_glom$Genus[data_glom$Abundance < 0.03] <- "< 3% abundancia"
+data_glom$Genus[data_glom$Genus == "unidentified"] <- "Not classified"
+data_glom$Genus[data_glom$Genus == "undefined"] <-"Not classified"
+
+  
+p3<-ggplot(data_glom, aes(x = Lenticel_disease_status, y = Abundance/6, fill = reorder(Genus, Abundance)))+
+  geom_bar(stat = "identity") + facet_wrap(~Farm1) + scale_fill_manual(values =plot_colors, name ="Genus") +
+  ylab("Relative abundance") + xlab("")  +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        rect = element_rect(fill = "white",  colour = "black",  size = 0.5, linetype = 1),
+        axis.line = element_line(colour = "black"),
+        axis.ticks = element_line(colour = "black"),
+        axis.title.y = element_text(face="plain", colour="black", size=14,family="serif"),
+        axis.text.x  = element_text(face="plain", colour = "black", angle=30, vjust=0.6, size=10,family="serif"),
+        axis.text.y  = element_text(face="plain",colour = "black", angle=360, vjust=0.5, size=10,family="serif"),
+        panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
+        panel.border = element_blank()) + scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  theme(legend.title = element_text(family="serif",size=12),legend.text = element_text(family="serif",size=10)) +
+  theme(strip.text.x = element_text(size = 12 , family = 'serif')) 
+
+
+
+```
+
+```{r}
+#po<-ggarrange(p1,ggarrange(p2, p3, nrow = 2), ncol = 2    , widths = c(0.78,1))
+
+
+p1 <- p1 + theme(legend.key.height= unit(0.2, 'cm'),
+        legend.key.width= unit(0.2, 'cm'))
+
+
+p2 <- p2 + theme(legend.key.height= unit(0.2, 'cm'),
+        legend.key.width= unit(0.2, 'cm'))
+
+
+p3 <- p3 + theme(legend.key.height= unit(0.2, 'cm'),
+        legend.key.width= unit(0.2, 'cm'))
+
+po<-grid.arrange(p1+labs(tag= "A"),p3+labs(tag = "B"),p2+labs(tag = "C"), ncol=1,nrow = 3)
+
+
+library(patchwork)
+p2/p3 
+```
+
+
