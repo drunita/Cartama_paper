@@ -25,6 +25,9 @@ library(ggpubr)
 library(readxl)
 library(vegan)
 library(biomformat)
+library(patchwork)
+
+path<-"C:/Users/Dru/Desktop/Cartama_paper/files/MicrobialEcology"
 
 
 ```
@@ -95,7 +98,7 @@ p1 <- p1 +     geom_signif(test="t.test", comparisons = list(c("Severe", "Mild")
 Loading the dataframe containing the alpha diversity metrics for the for the differentialy diseased fruits
 
 ```{r alfa df}
-Alfa <- read_excel("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/Alfa/Alfa.xlsx")
+Alfa <- read_excel(paste(path,"/Alfa.xlsx",sep=""))
 head(Alfa)
 ```
 Ploting the alpha_diversity metrics
@@ -183,8 +186,8 @@ f <- f + geom_signif(test="t.test", comparisons = list(c("Mild", "Severe")), map
 Loading the ASVs table after CCS normalization and the phylogenetic tree for the Beta diversity annalysis
 
 ```{r uploading the CCS.biom and tree.nwk}
-biomfile <- import_biom("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/css_eff.biom")
-biomfile_mapfile <- import_qiime_sample_data("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/metadata_real.txt")
+biomfile <- import_biom(paste(path,"/css_eff.biom",sep=""))
+biomfile_mapfile <- import_qiime_sample_data(paste(path,"/metadata_real.txt",sep=""))
 biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
 colnames(tax_table(biomfile_merged)) <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 sam <-sample_data(biomfile_merged)
@@ -192,7 +195,7 @@ sam <-sample_data(biomfile_merged)
 otu.table <- otu_table(biomfile_merged)
 taxa <- tax_table(biomfile_merged)
 
-tree <- read_tree("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/tree.nwk")
+tree <- read_tree(paste(path,"/tree.nwk",sep=""))
 
 otutax = phyloseq(otu.table, taxa)
 merge2 = merge_phyloseq(otutax, sam, tree)
@@ -266,8 +269,8 @@ Loading the ASVs table
 
 
 ```{r data barplot}
-biomfile <- import_biom("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/ASVs_table9_dada2R.biom")
-biomfile_mapfile <- import_qiime_sample_data("C:/Users/Dru/Desktop/microbial-ecology-avocado/Resultados_all/metadata_real.txt")
+biomfile <- import_biom(paste(path,"/ASVs_table9_dada2R.biom",sep=""))
+biomfile_mapfile <- import_qiime_sample_data(paste(path,"/metadata_real.txt",sep=""))
 biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
 colnames(tax_table(biomfile_merged)) <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 #sample_data(biomfile_merged)
@@ -399,7 +402,7 @@ p3 <- p3 + theme(legend.key.height= unit(0.2, 'cm'),
 po<-grid.arrange(p1+labs(tag= "A"),p3+labs(tag = "B"),p2+labs(tag = "C"), ncol=1,nrow = 3)
 
 
-library(patchwork)
+
 p2/p3 
 ```
 
