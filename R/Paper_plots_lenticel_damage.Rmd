@@ -28,7 +28,7 @@ loadfonts(device = "win")
 Loading and inspecting the file 'Lenticel_Damage_Summary_All_Harvest.xlsx'. This file has two-years of lenticel damage measurements recorded in two avocado farms across four harvest.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-Lenticel_file <- read_excel("C:/Users/Dru/Desktop/Paper_Aguacate/Lenticel_Damage_Summary_All_Harvest.xlsx")
+Lenticel_file <- read_excel("C:/Users/Dru/Desktop/Cartama_paper/files/Lenticel_Damage_Summary_All_Harvest.xlsx")
 glimpse(Lenticel_file)
 ```
 Checking for NA, miss speels and anomalies in the data:
@@ -150,6 +150,7 @@ p1 <- p1 + theme(strip.text.x = element_text(size = 14 , family = 'serif'))
 ```{r severity and incidence plot}
 
  plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure1.png",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
 
 ```
 
@@ -224,6 +225,7 @@ p1 <- p1 + theme(legend.text = element_text(size=12, angle=0,family = 'serif'),
 ```{r severity and incidence in time plot}
 
  plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure2.png",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
 
 ```
 

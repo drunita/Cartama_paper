@@ -85,12 +85,13 @@ p1 <- p1 +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family
 p1 <- p1 + theme(strip.text.x = element_text(size = 14,family = 'serif'))
 p1 <- p1 +     geom_signif(test="t.test", comparisons = list(c("Severe", "Mild")), map_signif_level = T)
 ```
-*Supplementary figure 3.* Lenticel damage for avocado cv. Hass fruits used for the microbial-community analysis. Fruits were collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Shown are the means and standard deviations for the severity (A) and incidence (B) of the damage for the fruits with deferent levels of affection. The points show the severity and incidence for the fruits and the asterisk denote statistic differences at the 99.0% () and 99.9% () confidence level according to the t test (n: 6).
+*Supplementary figure 1.* Lenticel damage for avocado cv. Hass fruits used for the microbial-community analysis. Fruits were collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Shown are the means and standard deviations for the severity (A) and incidence (B) of the damage for the fruits with deferent levels of affection. The points show the severity and incidence for the fruits and the asterisk denote statistic differences at the 99.0% () and 99.9% () confidence level according to the t test (n: 6).
 
 
 ```{r severity and incidence plot}
 
  plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Supplementary figure 1.png",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
 ```
 
 ## Alpha diversity plot
@@ -175,11 +176,12 @@ f <- f + geom_signif(test="t.test", comparisons = list(c("Mild", "Severe")), map
 
 ```
 
-*Figure 3.* Alfa diversity for the fungal communities of the avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Shown are the means and standard deviations for the alfa diversity index richness (A), Shannon (B), and Faith (C) alpha-diversity and the asterisk denote statistic differences at the 99.0% () and 99.9% () confidence level according to the t test (n: 6).
+*Figure 3.* Alfa diversity for the fungal communities of the avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Escondida and El Sinai farms during the traviesa harvest of 2020. Bars and error bars represent mean and standard deviation for the alfa diversity index richness (A), Shannon (B), and Faith pd (C) alpha-diversity (n: 6). The points show the alfa diversity metrics the fruits and the asterisk denote statistic differences at the 95.0 % confidence level (*) according to the t test.
 
 ```{r severity and incidence plot}
 
  alpha_plot<-grid.arrange(r + labs(tag = 'A'),s + labs(tag = 'B'), f + labs(tag = 'C'), ncol=3,nrow=1)
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure 3.png",plot=alpha_plot,dpi = 300,width = 9,height = 4,units = c("in"))
 ```
 
 ## Beta diversity plots
@@ -220,9 +222,10 @@ PCoA = PCoA  +
         axis.text.y  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=10),
         panel.background = element_rect(fill = "white", colour = "black", linetype = 1, size = 0.5),
         panel.border = element_blank(), legend.title = element_blank(), legend.text=element_text(size=11,family = "serif"), plot.margin = margin(1, 0.6, 1, 1, "cm"))  +
-  scale_colour_manual(values=c("gray85","gray65","gray85","gray65"),labels = c("Escondida_Mild","Escondida_Severe", "Sinai_Mild","Sinai_Severe"))+  
+  scale_colour_manual(values=c("gray85","gray55","gray85","gray55"),labels = c("Escondida_Mild","Escondida_Severe", "Sinai_Mild","Sinai_Severe"))+  
   stat_ellipse(type = "t", size=0.5) + theme(legend.position = "bottom") +
-  labs(x = "PCoA (60.4%)", y= "PCoA (12.2%)")
+  labs(x = "PCoA (60.4%)", y= "PCoA (12.2%)")+ guides(colour = guide_legend(order = 2), 
+              shape = guide_legend(order = 1))
 legend <- get_legend(PCoA)
 PCoA <- PCoA + theme(legend.position="none")
 
@@ -249,7 +252,7 @@ CAP = agricultural_plot  +
         axis.text.y  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=10),
         panel.background = element_rect(fill = "white", colour = "black", linetype = 1, size = 0.5),
         panel.border = element_blank(), legend.title = element_blank(), legend.text=element_text(size=11,family = "serif"), plot.margin = margin(0.71, 1, 1, 0.6, "cm"))  +
-  scale_colour_manual(values=c("gray85","gray65","gray85","gray65"),labels =
+  scale_colour_manual(values=c("gray85","gray55","gray85","gray55"),labels =
                         c("Escondida_Mild","Escondida_Severe",
                           "Sinai_Mild","Sinai_Severe")) + 
   stat_ellipse(type = "t", size=0.5) + labs(x = "CAP (23.7%)", y= "CAP (45.8%)")+theme(legend.position = "none")
@@ -263,6 +266,7 @@ CAP = agricultural_plot  +
 po<-grid.arrange(PCoA+labs(tag = "A"),CAP+labs(tag = "B"),legend, ncol=2,nrow = 2, 
              layout_matrix = rbind(c(1,2), c(3,3)),
              widths = c(2.7, 2.7), heights = c(2.5, 0.2))
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure 4.png",plot=po,dpi = 300,width = 9,height = 6,units = c("in"))
 ```
 ## Taxonomy bat plots
 Loading the ASVs table 
@@ -309,7 +313,7 @@ p1 <- ggplot(data_glom, aes(x = Lenticel_disease_status, y = Abundance/6, fill =
         axis.text.y  = element_text(face="plain",colour = "black", angle=360, vjust=0.5, size=10,family="serif"),
         panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
         panel.border = element_blank()) + scale_y_continuous(labels = percent_format(accuracy = 1)) +
-  theme(legend.title = element_blank(),legend.text = element_text(family="serif",size=10)) + 
+  theme(legend.title = element_blank(),legend.text = element_text(family="serif",size=10)) + theme(legend.position="bottom")+
   theme(strip.text.x = element_text(size = 12 , family = 'serif')) 
 
 
@@ -384,6 +388,8 @@ p3<-ggplot(data_glom, aes(x = Lenticel_disease_status, y = Abundance/6, fill = r
 
 ```
 
+*Fig 5.* Taxonomic composition of the fungal communities of the avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Escondida and El Sinai during the traviesa harvest of 2020. Shown are the relative abundances of the fungal families of the entire communities (A) and the genus for the communities of Ascomycota (B) and Basidiomycota (C). 
+
 ```{r}
 #po<-ggarrange(p1,ggarrange(p2, p3, nrow = 2), ncol = 2    , widths = c(0.78,1))
 
@@ -399,11 +405,187 @@ p2 <- p2 + theme(legend.key.height= unit(0.2, 'cm'),
 p3 <- p3 + theme(legend.key.height= unit(0.2, 'cm'),
         legend.key.width= unit(0.2, 'cm'))
 
-po<-grid.arrange(p1+labs(tag= "A"),p3+labs(tag = "B"),p2+labs(tag = "C"), ncol=1,nrow = 3)
+#po<-grid.arrange(p1+labs(tag= "A"),p3+labs(tag = "B"),p2+labs(tag = "C"), ncol=1,nrow = 3)
 
-
-
-p2/p3 
+po<-ggarrange(p1+labs(tag= "A"),                                                
+          ggarrange(p2+labs(tag= "B"), p3+labs(tag= "C"), nrow = 2), 
+          ncol = 2    , widths = c(0.71,1)                              
+) 
+po
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure 5.png",plot=po,dpi = 300,width = 10,height = 7,units = c("in"))
+#p2/p3 
 ```
 
+### diferential abundance analysis
+
+loading the data for diferencial abundance annalysis-Escondida
+
+```{r escondida diferential abundance}
+
+biomfile <- import_biom(paste(path,"/ASVs_enrich_Escondida.biom",sep=""))
+biomfile_mapfile <- import_qiime_sample_data(paste(path,"/metadata_real1.txt",sep=""))
+biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
+colnames(tax_table(biomfile_merged)) <- c( "Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+sam <-sample_data(biomfile_merged)
+otu.table <- otu_table(biomfile_merged)
+otu.table<-otu.table[!(otu.table[,1]<0.0005&otu.table[,2]<0.0005),]
+taxa <- tax_table(biomfile_merged)
+tree <- read_tree(paste(path,"/tree.nwk",sep = ""))
+otutax = phyloseq(otu.table, taxa)
+merge2 = merge_phyloseq(otutax, sam, tree)
+GP.chl <- merge2
+y<-as.data.frame(otu_table(GP.chl))
+y <- y %>%   rownames_to_column(var = "ASVs")
+
+mi_df <- data.frame(
+  "ASVs" = c(y$ASVs,y$ASVs), 
+  "Abundance" = c(y$Escondida_Severo,y$Escondida_Leve), 
+  "Farm" = c(rep("Escondida_Severe", length(y$Escondida_Severo)),rep("Escondida_Mild", length(y$Escondida_Leve)))
+)
+mi_df$ASVs <- factor(mi_df$ASVs,c(phy_tree(GP.chl)$tip.label))
+
+
+head(mi_df)
+
+```
+
+## Escondida plot
+
+*Fig 6.* Taxonomy and relative abundance of the amplicon sequence variants (ASVs) enriched (p-value < 0.05) in the fungal communities of avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Escondida during the traviesa harvest of 2020. Shown are the taxonomic relation (A) and the relative abundances (B) of the ASVs group by color according to the clade (Supplementary Table 5). 
+```{r escondida dif abundance plot}
+p<-plot_tree(GP.chl,text.size=5,method = "treeonly",nodelabf=nodeplotboot(size = 5))+
+  theme(panel.grid.major = element_blank(),
+        plot.margin= margin(t =-0.02, r = 0, b = 1.55, l = 0, unit = "cm"),
+        panel.grid.minor = element_blank())+  geom_text(x=0.05, y=43,label="A",size=5)
+
+p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual(values=c("Escondida_Leve" = "gray85", "Escondida_Severo" = "gray50"),labels = c("Mild", "Severe"))+ theme_classic()+scale_y_continuous(expand = c(0, 0))+
+  theme(panel.grid.major = element_blank(),
+        plot.margin= margin(t = 0.9, r = 0, b = 0.5, l = -0.50, unit = "cm"),
+        axis.ticks.x  = element_line(colour = "black"),axis.ticks.y  = element_line(colour = "white"),
+        axis.title.x = element_text(face="plain",family = "serif", colour="black", size=22),
+        axis.ticks.length.y = unit(0.05, "cm"),axis.ticks.length.x = unit(0.2, "cm"),
+        axis.text.x  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=20),
+        axis.text.y  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=17,margin = margin(t = 0.05, unit = "cm")),
+        panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
+        panel.border = element_blank(), legend.title = element_text(size=24,family = "serif"), legend.text=element_text(size=20,family = "serif"))+
+  geom_bar(stat="identity")+ coord_flip() + 
+  
+   annotate("rect", xmin = 0, xmax = 4.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "yellow") +
+   annotate("rect", xmin = 0, xmax = 4.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
+   annotate("text", x = 3.8, y = 30, label = "Not_clasified", parse = TRUE,size=9,family = "serif", hjust = 1)+
+  annotate("rect", xmin = 4.5, xmax = 5.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "darkseagreen")+
+   annotate("rect", xmin = 5.5, xmax = 15.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "black") +
+   annotate("rect", xmin = 15.5, xmax = 19.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "cyan4")+
+   annotate("rect", xmin = 4.5, xmax = 19.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
+   annotate("text", x = 18.8, y = 30, label = "Basidiomycetes", parse = TRUE,size=9,family = "serif", hjust = 1)+
+   annotate("rect", xmin = 19.5, xmax = 20.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "palegreen4") +
+   annotate("rect", xmin = 20.5, xmax = 24.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "red4") +
+   annotate("rect", xmin = 24.5, xmax = 25.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "yellow4") +
+  annotate("rect", xmin = 25.5, xmax = 37.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "cyan4") +
+   annotate("rect", xmin = 37.5, xmax = 41.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "darkseagreen") +
+   annotate("rect", xmin = 41.5, xmax = 43.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "black") +
+   annotate("rect", xmin = 19.5, xmax = 43.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
+   annotate("text", x = 42.8, y = 30, label = "Ascomycetes", parse = TRUE,size=9,family = "serif", hjust = 1)+  
+   annotate("text", x = 43, y = 33.5, label = "I", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 41, y = 33.5, label = "II", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 37, y = 33.5, label = "III", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 25, y = 33.5, label = "IV", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 24, y = 33.5, label = "V", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 20, y = 33.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 19, y = 33.5, label = "VII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 15, y = 33.5, label = "VIII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 5, y = 33.5, label = "IX", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  annotate("text", x = 4, y = 33.5, label = "X", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  
+labs( y= "Relative abundance (%)", x="")+ labs(fill = "Lenticel damage")
+
+po<-ggarrange(p,p1+labs(tag= "B"),   ncol = 2    , widths = c(0.5,1)) 
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Fig 6.png",dpi = 300,width = 13.5, height = 12, units = c("in"))
+```
+
+loading the data for diferencial abundance annalysis-Sinai
+
+```{r Sinai diferential abundance}
+
+biomfile <- import_biom(paste(path,"/ASVs_enrich_Sinai.biom",sep=""))
+biomfile_mapfile <- import_qiime_sample_data(paste(path,"/metadata_real1.txt",sep=""))
+biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
+colnames(tax_table(biomfile_merged)) <- c( "Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+sam <-sample_data(biomfile_merged)
+otu.table <- otu_table(biomfile_merged)
+head(otu.table)
+otu.table<-otu.table[!(otu.table[,1]<0.0005&otu.table[,2]<0.0005),]
+taxa <- tax_table(biomfile_merged)
+tree <- read_tree(paste(path,"/tree.nwk",sep = ""))
+otutax = phyloseq(otu.table, taxa)
+merge2 = merge_phyloseq(otutax, sam, tree)
+GP.chl <- merge2
+y<-as.data.frame(otu_table(GP.chl))
+y <- y %>%   rownames_to_column(var = "ASVs")
+
+mi_df <- data.frame(
+  "ASVs" = c(y$ASVs,y$ASVs), 
+  "Abundance" = c(y$Sinai_Severo,y$Sinai_Leve), 
+  "Farm" = c(rep("Sinai_Severe", length(y$Sinai_Severo)),rep("Sinai_Mild", length(y$Sinai_Leve)))
+)
+mi_df$ASVs <- factor(mi_df$ASVs,c(phy_tree(GP.chl)$tip.label))
+
+mi_df
+```
+*Fig 7.* Taxonomy and relative abundance of the amplicon sequence variants (ASVs) enriched (p- value < 0.05) in the fungal communities of avocado cv. Hass fruits with different severities of lenticel damage (Mild and Severe) collected from the La Sinai during the traviesa harvest of 2020. Shown are the taxonomic relation (A) and the relative abundances (B) of the ASVs group by color according to the clade (Supplementary Table 6). 
+```{r sinai plot}
+p<-plot_tree(GP.chl,text.size=15,method = "treeonly",nodelabf=nodeplotboot(size = 4))+
+       theme(panel.grid.major = element_blank(),
+             plot.margin= margin(t =-0.1, r = 0, b = 1.3, l = 0, unit = "cm"),
+             panel.grid.minor = element_blank()) +  geom_text(x=0.05, y=78,label="A",size=5)
+
+
+p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual(values=c("Sinai_Leve" = "gray85", "Sinai_Severo" = "gray50"),labels =c("Mild", "Severe"))+ theme_classic()+scale_y_continuous(expand = c(0, 0))+
+  theme(panel.grid.major = element_blank(),
+        plot.margin= margin(t = 0.9, r = 0, b = 0.5, l = -0.50, unit = "cm"),
+        axis.ticks.x  = element_line(colour = "black"),axis.ticks.y  = element_line(colour = "white"),
+        axis.title.x = element_text(face="plain",family = "serif", colour="black", size=22),
+        axis.ticks.length.y = unit(0.05, "cm"),axis.ticks.length.x = unit(0.2, "cm"),
+        axis.text.x  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=20),
+        axis.text.y  = element_text(face="plain",family = "serif", colour = "black", angle=360, vjust=0.5, size=13,margin = margin(t = 0.05, unit = "cm")),
+        panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
+        panel.border = element_blank(), legend.title = element_text(size=24,family = "serif"), legend.text=element_text(size=20,family = "serif"))+
+  geom_bar(stat="identity")+ coord_flip() + 
+        
+        annotate("rect", xmin = 0, xmax = 3.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "yellow") +
+        annotate("rect", xmin = 0, xmax = 3.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
+        annotate("text", x = 2.2, y = 20, label = "Not_clasified", parse = TRUE,size=7,family = "serif", hjust = 1)+
+  
+         annotate("rect", xmin = 3.5, xmax = 27.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "black") +
+        annotate("rect", xmin = 27.5, xmax = 29.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "red4") +
+        annotate("rect", xmin = 29.5, xmax = 33.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "cyan4")+
+        annotate("rect", xmin = 3.5, xmax = 33.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
+        annotate("text", x = 29.2, y = 20, label = "Basidiomycetes", parse = TRUE,size=7,family = "serif", hjust = 1)+
+    annotate("rect", xmin = 33.5, xmax = 37.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "palegreen4") +
+    annotate("rect", xmin = 37.5, xmax = 42.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "red4") +
+    annotate("rect", xmin = 42.5, xmax = 49.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "yellow4") +
+    annotate("rect", xmin = 49.5, xmax = 70.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "cyan4") +
+    annotate("rect", xmin = 70.5, xmax = 76.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "darkseagreen") +
+    annotate("rect", xmin = 76.5, xmax = 78.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "black") +
+    annotate("rect", xmin = 33.5, xmax = 78.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
+    annotate("text", x = 77.2, y = 20, label = "Ascomycetes", parse = TRUE,size=7,family = "serif", hjust = 1)+  
+   
+   annotate("text", x = 77.5, y = 23.5, label = "I", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 75, y = 23.5, label = "II", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 69, y = 23.5, label = "III", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 48, y = 23.5, label = "IV", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 41, y = 23.5, label = "V", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 36, y = 23.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+  
+   annotate("text", x = 30, y = 23.5, label = "VII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    annotate("text", x = 28.5, y = 23.5, label = "VIII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    annotate("text", x = 27, y = 23.5, label = "IX", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    annotate("text", x = 2, y = 23.5, label = "X", parse = TRUE,size=6,family = "serif", hjust = 1)+
+
+  labs( y= "Relative abundance (%)", x="")+ labs(fill = "Lenticel damage")
+
+
+
+po<-ggarrange(p,p1+labs(tag= "B"),   ncol = 2    , widths = c(0.5,1)) 
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Fig7.png",plot=po,dpi = 300,width = 13.5,height = 12,units = c("in"))
+```
 
