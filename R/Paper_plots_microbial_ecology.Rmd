@@ -428,7 +428,8 @@ biomfile_merged <- merge_phyloseq(biomfile,biomfile_mapfile)
 colnames(tax_table(biomfile_merged)) <- c( "Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 sam <-sample_data(biomfile_merged)
 otu.table <- otu_table(biomfile_merged)
-otu.table<-otu.table[!(otu.table[,1]<0.0005&otu.table[,2]<0.0005),]
+#otu.table<-otu.table[!(otu.table[,1]<0.0005&otu.table[,2]<0.0005),]
+otu.table<-otu.table[!(otu.table[,1]<0.002&otu.table[,2]<0.002),]
 taxa <- tax_table(biomfile_merged)
 tree <- read_tree(paste(path,"/tree.nwk",sep = ""))
 otutax = phyloseq(otu.table, taxa)
@@ -445,7 +446,7 @@ mi_df <- data.frame(
 mi_df$ASVs <- factor(mi_df$ASVs,c(phy_tree(GP.chl)$tip.label))
 
 
-head(mi_df)
+print(mi_df)
 
 ```
 
@@ -456,9 +457,11 @@ head(mi_df)
 p<-plot_tree(GP.chl,text.size=5,method = "treeonly",nodelabf=nodeplotboot(size = 5))+
   theme(panel.grid.major = element_blank(),
         plot.margin= margin(t =-0.02, r = 0, b = 1.55, l = 0, unit = "cm"),
-        panel.grid.minor = element_blank())+  geom_text(x=0.05, y=43,label="A",size=5)
+        panel.grid.minor = element_blank())+  geom_text(x=0.05, y=29.95,label="A",size=5)
 
-p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual(values=c("Escondida_Leve" = "gray85", "Escondida_Severo" = "gray50"),labels = c("Mild", "Severe"))+ theme_classic()+scale_y_continuous(expand = c(0, 0))+
+p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  
+  scale_fill_manual(values=c("Escondida_Mild" = "gray85", "Escondida_Severe" = "gray40"),labels = c("Mild", "Severe"))+
+  theme_classic()+scale_y_continuous(expand = c(0, 0))+
   theme(panel.grid.major = element_blank(),
         plot.margin= margin(t = 0.9, r = 0, b = 0.5, l = -0.50, unit = "cm"),
         axis.ticks.x  = element_line(colour = "black"),axis.ticks.y  = element_line(colour = "white"),
@@ -469,33 +472,35 @@ p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual
         panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
         panel.border = element_blank(), legend.title = element_text(size=24,family = "serif"), legend.text=element_text(size=20,family = "serif"))+
   geom_bar(stat="identity")+ coord_flip() + 
+  annotate("rect", xmin = 0, xmax = 3.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "yellow") +
+   annotate("rect", xmin = 0, xmax = 3.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
+   annotate("text", x = 2.7, y = 30, label = "Not_clasified", parse = TRUE,size=9,family = "serif", hjust = 1)+
   
-   annotate("rect", xmin = 0, xmax = 4.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "yellow") +
-   annotate("rect", xmin = 0, xmax = 4.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
-   annotate("text", x = 3.8, y = 30, label = "Not_clasified", parse = TRUE,size=9,family = "serif", hjust = 1)+
-  annotate("rect", xmin = 4.5, xmax = 5.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "darkseagreen")+
-   annotate("rect", xmin = 5.5, xmax = 15.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "black") +
-   annotate("rect", xmin = 15.5, xmax = 19.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "cyan4")+
-   annotate("rect", xmin = 4.5, xmax = 19.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
-   annotate("text", x = 18.8, y = 30, label = "Basidiomycetes", parse = TRUE,size=9,family = "serif", hjust = 1)+
-   annotate("rect", xmin = 19.5, xmax = 20.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "palegreen4") +
-   annotate("rect", xmin = 20.5, xmax = 24.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "red4") +
-   annotate("rect", xmin = 24.5, xmax = 25.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "yellow4") +
-  annotate("rect", xmin = 25.5, xmax = 37.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "cyan4") +
-   annotate("rect", xmin = 37.5, xmax = 41.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "darkseagreen") +
-   annotate("rect", xmin = 41.5, xmax = 43.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "black") +
-   annotate("rect", xmin = 19.5, xmax = 43.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
-   annotate("text", x = 42.8, y = 30, label = "Ascomycetes", parse = TRUE,size=9,family = "serif", hjust = 1)+  
-   annotate("text", x = 43, y = 33.5, label = "I", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 41, y = 33.5, label = "II", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 37, y = 33.5, label = "III", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 25, y = 33.5, label = "IV", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 24, y = 33.5, label = "V", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 20, y = 33.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 19, y = 33.5, label = "VII", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 15, y = 33.5, label = "VIII", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 5, y = 33.5, label = "IX", parse = TRUE,size=6,family = "serif", hjust = 1)+
-  annotate("text", x = 4, y = 33.5, label = "X", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  annotate("text", x = 3, y = 33.5, label = "IX", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  
+  annotate("rect", xmin = 3.5, xmax = 4.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "darkseagreen")+
+   annotate("rect", xmin = 4.5, xmax = 10.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "black") +
+  
+   annotate("rect", xmin = 10.5, xmax = 13.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "cyan4")+
+  
+   annotate("rect", xmin = 3.5, xmax = 13.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
+   annotate("text", x = 12.8, y = 30, label = "Basidiomycetes", parse = TRUE,size=9,family = "serif", hjust = 1)+
+     annotate("text", x = 13, y = 33.5, label = "VIII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 9.8, y = 33.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("text", x = 4, y = 33.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("rect", xmin = 13.5, xmax = 14.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "palegreen4") +
+   annotate("text", x = 14, y = 33.5, label = "V", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("rect", xmin = 14.5, xmax = 17.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "red4") +
+  
+  annotate("text", x = 17, y = 33.5, label = "IV", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("rect", xmin = 17.5, xmax = 27.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "yellow4") +
+     annotate("text", x = 27, y = 33.5, label = "III", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  annotate("rect", xmin = 27.5, xmax = 28.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "cyan4") +
+  annotate("text", x = 28, y = 33.5, label = "II", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("rect", xmin = 28.5, xmax = 30.5, ymin = 0, ymax = 35,   alpha = .1,  fill = "darkseagreen") +
+     annotate("text", x = 30, y = 33.5, label = "I", parse = TRUE,size=6,family = "serif", hjust = 1)+
+   annotate("rect", xmin = 13.5, xmax = 30.5, ymin = 0, ymax = 35,   alpha = .1,  col = "black") +
+   annotate("text", x = 29.8, y = 30, label = "Ascomycetes", parse = TRUE,size=9,family = "serif", hjust = 1)+  
   
 labs( y= "Relative abundance (%)", x="")+ labs(fill = "Lenticel damage")
 
@@ -514,7 +519,7 @@ colnames(tax_table(biomfile_merged)) <- c( "Domain", "Phylum", "Class", "Order",
 sam <-sample_data(biomfile_merged)
 otu.table <- otu_table(biomfile_merged)
 head(otu.table)
-otu.table<-otu.table[!(otu.table[,1]<0.0005&otu.table[,2]<0.0005),]
+otu.table<-otu.table[!(otu.table[,1]<0.002&otu.table[,2]<0.002),]
 taxa <- tax_table(biomfile_merged)
 tree <- read_tree(paste(path,"/tree.nwk",sep = ""))
 otutax = phyloseq(otu.table, taxa)
@@ -537,10 +542,9 @@ mi_df
 p<-plot_tree(GP.chl,text.size=15,method = "treeonly",nodelabf=nodeplotboot(size = 4))+
        theme(panel.grid.major = element_blank(),
              plot.margin= margin(t =-0.1, r = 0, b = 1.3, l = 0, unit = "cm"),
-             panel.grid.minor = element_blank()) +  geom_text(x=0.05, y=78,label="A",size=5)
+             panel.grid.minor = element_blank()) +  geom_text(x=0.05, y=38,label="A",size=5)
 
-
-p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual(values=c("Sinai_Leve" = "gray85", "Sinai_Severo" = "gray50"),labels =c("Mild", "Severe"))+ theme_classic()+scale_y_continuous(expand = c(0, 0))+
+p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual(values=c("Sinai_Mild" = "gray85", "Sinai_Severe" = "gray50"),labels =c("Mild", "Severe"))+ theme_classic()+scale_y_continuous(expand = c(0, 0))+
   theme(panel.grid.major = element_blank(),
         plot.margin= margin(t = 0.9, r = 0, b = 0.5, l = -0.50, unit = "cm"),
         axis.ticks.x  = element_line(colour = "black"),axis.ticks.y  = element_line(colour = "white"),
@@ -551,35 +555,49 @@ p1<-ggplot(mi_df, aes(x=ASVs, y =Abundance*100, fill=Farm ))+  scale_fill_manual
         panel.background = element_rect(fill = "white", colour = "white", linetype = 1, size = 0.5),
         panel.border = element_blank(), legend.title = element_text(size=24,family = "serif"), legend.text=element_text(size=20,family = "serif"))+
   geom_bar(stat="identity")+ coord_flip() + 
-        
-        annotate("rect", xmin = 0, xmax = 3.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "yellow") +
-        annotate("rect", xmin = 0, xmax = 3.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
-        annotate("text", x = 2.2, y = 20, label = "Not_clasified", parse = TRUE,size=7,family = "serif", hjust = 1)+
   
-         annotate("rect", xmin = 3.5, xmax = 27.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "black") +
-        annotate("rect", xmin = 27.5, xmax = 29.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "red4") +
-        annotate("rect", xmin = 29.5, xmax = 33.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "cyan4")+
-        annotate("rect", xmin = 3.5, xmax = 33.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
-        annotate("text", x = 29.2, y = 20, label = "Basidiomycetes", parse = TRUE,size=7,family = "serif", hjust = 1)+
-    annotate("rect", xmin = 33.5, xmax = 37.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "palegreen4") +
-    annotate("rect", xmin = 37.5, xmax = 42.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "red4") +
-    annotate("rect", xmin = 42.5, xmax = 49.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "yellow4") +
-    annotate("rect", xmin = 49.5, xmax = 70.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "cyan4") +
-    annotate("rect", xmin = 70.5, xmax = 76.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "darkseagreen") +
-    annotate("rect", xmin = 76.5, xmax = 78.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "black") +
-    annotate("rect", xmin = 33.5, xmax = 78.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
-    annotate("text", x = 77.2, y = 20, label = "Ascomycetes", parse = TRUE,size=7,family = "serif", hjust = 1)+  
+  
+  
+        annotate("rect", xmin = 0, xmax = 2.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "yellow") +
+        annotate("rect", xmin = 0, xmax = 2.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
+        annotate("text", x = 1.2, y = 20, label = "Not_clasified", parse = TRUE,size=7,family = "serif", hjust = 1)+
+  annotate("text", x = 1.7, y = 23.5, label = "IX", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  
+         annotate("rect", xmin = 2.5, xmax = 13.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "black") +
+        annotate("rect", xmin = 13.5, xmax = 14.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "red4") +
+      annotate("rect", xmin = 2.5, xmax = 14.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
+        annotate("text", x = 13.8, y = 20, label = "Basidiomycetes", parse = TRUE,size=7,family = "serif", hjust = 1)+
+  
+ annotate("text", x = 14, y = 23.5, label = "VII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    annotate("text", x = 13, y = 23.5, label = "VIII", parse = TRUE,size=6,family = "serif", hjust = 1)+
+          annotate("rect", xmin = 14.5, xmax = 16.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "cyan4")+
+  
+   annotate("text", x = 19, y = 23.5, label = "V", parse = TRUE,size=6,family = "serif", hjust = 1)+  
+   annotate("rect", xmin = 16.5, xmax = 19.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "palegreen4") +
+   annotate("text", x = 16, y = 23.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    
    
-   annotate("text", x = 77.5, y = 23.5, label = "I", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 75, y = 23.5, label = "II", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 69, y = 23.5, label = "III", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 48, y = 23.5, label = "IV", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 41, y = 23.5, label = "V", parse = TRUE,size=6,family = "serif", hjust = 1)+
-   annotate("text", x = 36, y = 23.5, label = "VI", parse = TRUE,size=6,family = "serif", hjust = 1)+  
-   annotate("text", x = 30, y = 23.5, label = "VII", parse = TRUE,size=6,family = "serif", hjust = 1)+
-    annotate("text", x = 28.5, y = 23.5, label = "VIII", parse = TRUE,size=6,family = "serif", hjust = 1)+
-    annotate("text", x = 27, y = 23.5, label = "IX", parse = TRUE,size=6,family = "serif", hjust = 1)+
-    annotate("text", x = 2, y = 23.5, label = "X", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    annotate("rect", xmin = 19.5, xmax = 22.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "red4") +
+  
+   annotate("text", x = 22, y = 23.5, label = "IV", parse = TRUE,size=6,family = "serif", hjust = 1)+
+    annotate("rect", xmin = 22.5, xmax = 31.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "yellow4") +
+  
+   annotate("text", x = 31, y = 23.5, label = "III", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  
+    annotate("rect", xmin = 31.5, xmax = 37.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "cyan4") +
+  
+   annotate("text", x = 37, y = 23.5, label = "II", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  
+    annotate("rect", xmin = 37.5, xmax = 38.5, ymin = 0, ymax = 25,   alpha = .1,  fill = "darkseagreen") +
+  
+   annotate("text", x = 38, y = 23.5, label = "I", parse = TRUE,size=6,family = "serif", hjust = 1)+
+  
+  
+    annotate("rect", xmin = 14.5, xmax = 38.5, ymin = 0, ymax = 25,   alpha = .1,  col = "black") +
+    annotate("text", x = 37.8, y = 20, label = "Ascomycetes", parse = TRUE,size=7,family = "serif", hjust = 1)+  
+  
+   
+    
 
   labs( y= "Relative abundance (%)", x="")+ labs(fill = "Lenticel damage")
 
