@@ -1,0 +1,17 @@
+				
+Permutational multivariate analysis of variance (PERMANOVA)				
+model: y ~ Farm 				
+Permutations: 999				
+	Df	SumOfSqs	F	p-value (>|F)
+model 	1	0.058	28.65	1x10-3
+Residual	22	0.045		
+model: y ~ Damage 				
+Permutations: 999				
+	Df	SumOfSqs	F	p-value (>|F)
+model 	1	0.009	2.17	0.1
+Residual	22	0.094		
+model: y ~ Populations				
+Permutations: 999				
+	Df	SumOfSqs	F	p-value (>|F)
+model 	3	0.072	15.46	1x10-3
+Residual	20	0.031		

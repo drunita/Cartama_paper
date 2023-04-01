@@ -20,6 +20,8 @@ library(tibble)
 library(ggplot2)
 library(extrafont)
 loadfonts(device = "win")
+library(ggsignif)
+library(ggpubr)
 
 ```
 
@@ -86,6 +88,9 @@ colnames(df)[which(names(df) == "Severidad_0")] <- "Sev_0dph"
 colnames(df)[which(names(df) == "Severidad_1")] <- "Sev_21dph"
 colnames(df)[which(names(df) == "Incidencia_0")] <- "Inc_0dph"
 colnames(df)[which(names(df) == "Incidencia_1")] <- "Inc_21dph"
+df$Inc_increase <- df$Inc_21dph-df$Inc_0dph
+df$Sev_increase <- df$Sev_21dph-df$Sev_0dph
+
 glimpse(df)
 summary(df$Sev_0dph)
 
@@ -105,7 +110,7 @@ for (i in 2:13){
   sev<-c(sev , df_mean[i,])
   inc <- c(inc , df_mean1[i,])
   }
-mat <- data.frame(rep(c("2019_m" , "2020_m" , "2020_t" , "2021_t") , 13) , c(rep("Escondida" , 24) , rep("Sinai" , 28)) , sev , inc)
+mat <- data.frame(rep(c("2019_m" , "2020_m" , "2020_t" , "2021_t") , 13) , c(rep("Escondida" , 20) , rep("Sinai" , 32)) , sev , inc)
 
 colnames(mat) <- c("Harvest" , "Farm" , "Severity" , "Incidence")
 
@@ -125,7 +130,7 @@ p <- p + theme(axis.title =element_text(size=14,family = 'serif'))
 p <- p +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
               axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
 p <- p + theme(strip.text.x = element_text(size = 14,family = 'serif'))
-
+p
 
 ```
 
@@ -137,11 +142,12 @@ p1 <-  ggplot(mat, aes(x = factor(Harvest,levels = c("2019_m","2020_t","2020_m",
       geom_bar(stat="summary", color="black", position=position_dodge(), fill=rep(c("gray90","gray70"),4),fun = mean) +
       stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar", color="black", width=0.2) 
 p1 <- p1 + geom_jitter()+ facet_wrap(~Farm) + theme_classic() 
-p1 <- p1 +  xlab("") + ylab("Necrotic spots")
+p1 <- p1 +  xlab("") + ylab("Number of necrotic spots")
 p1 <- p1 + theme(axis.title =element_text(size = 14 , family = 'serif'))
 p1 <- p1 +  theme(axis.text.x = element_text(face="bold", size = 12, angle = 0 , family = 'serif'),
               axis.text.y = element_text(face = "bold" , size = 12 , angle = 0 , family = 'serif'))
 p1 <- p1 + theme(strip.text.x = element_text(size = 14 , family = 'serif'))
+p1
 
 ```
 
@@ -150,7 +156,7 @@ p1 <- p1 + theme(strip.text.x = element_text(size = 14 , family = 'serif'))
 ```{r severity and incidence plot}
 
  plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
-ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure1.png",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure1_new.jpg",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
 
 ```
 
@@ -166,6 +172,10 @@ df1 <- na.omit(df)
  
 sev <- c(df1$Sev_0dph , df1$Sev_21dph)
 inc <- c(df1$Inc_0dph , df1$Inc_21dph)
+
+###stack plot
+#sev <- c(df1$Sev_0dph , df1$Sev_increase)
+#inc <- c(df1$Inc_0dph , df1$Inc_increase)
 farm <- c(df1$Farm , df1$Farm)
 time <-factor(c(rep("0dpc",length(sev)/2) , rep("21dpc",length(sev)/2)))
 harvest <- c(df1$Harvest , df1$Harvest)
@@ -188,7 +198,7 @@ head(mat1)
 
 ```{r severity in time}
 p <-  ggplot(mat1, aes(x = factor(Time), y = Severity)) + 
-      geom_bar(stat="summary", color="black", positio=position_dodge(), fill= rep(c("gray95","gray85") ,2), fun = mean) +
+      geom_bar(stat="summary", color="black", positio=position_dodge(), fill= rep(c("gray99","gray95") ,2), fun = mean) +
       stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar", color="black", width=0.2) 
 p <- p + geom_jitter(aes(colour = factor(Harvest , levels = c("2019_m" , "2020_t" , "2020_m" , "2021_t"))) , size = 2)
 p <- p + facet_wrap(~ Farm) + theme_classic() 
@@ -197,25 +207,26 @@ p <- p + theme(axis.title =element_text(size=14,family = 'serif'))
 p <- p +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
               axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
 p <- p + theme(strip.text.x = element_text(size = 14,family = 'serif'))
-p <- p + scale_color_manual(name = "Harvest", values =  rep(c("gray70","gray40") ,2))
+p <- p + scale_color_manual(name = "Harvest",  values =  c("gray88","gray70","gray47","gray0"))
 p <- p + theme(legend.text = element_text(size=12, angle=0,family = 'serif'),
                 legend.title = element_text(face="bold",size=12, angle=0,family = 'serif'))
+p
 
 ```
 * The barplot showing the increase in the Incidence of lenticel damage during the cold storage. The bars and error bars represent the incidence mean and standard deviation observed in the farms at the two evaluations (0 dph and 21 dph), and the points represent the severity mean for the harvest in the farm.
 
 ```{r incidence in time}
 p1 <-  ggplot(mat1, aes(x = factor(Time), y = Incidence)) + 
-      geom_bar(stat="summary", color="black", positio=position_dodge(), fill= rep(c("gray95","gray85") ,2), fun = mean) +
+      geom_bar(stat="summary", color="black", positio=position_dodge(), fill= rep(c("gray99","gray95") ,2), fun = mean) +
       stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), geom="errorbar", color="black", width=0.2) 
 p1 <- p1 + geom_jitter(aes(colour = factor(Harvest , levels = c("2019_m" , "2020_t" , "2020_m" , "2021_t"))) , size = 2)
 p1 <- p1 + facet_wrap(~ Farm) + theme_classic() 
-p1 <- p1 +  xlab("") + ylab("Necrotic spots")
+p1 <- p1 +  xlab("") + ylab("Number of necrotic spots")
 p1 <- p1 + theme(axis.title =element_text(size=14,family = 'serif'))
 p1 <- p1 +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
               axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
 p1 <- p1 + theme(strip.text.x = element_text(size = 14,family = 'serif'))
-p1 <- p1 + scale_color_manual(name = "Harvest", values =  rep(c("gray70","gray40") ,2))
+p1 <- p1 + scale_color_manual(name = "Harvest", values =  c("gray88","gray70","gray47","gray0"))
 p1 <- p1 + theme(legend.text = element_text(size=12, angle=0,family = 'serif'),
                 legend.title = element_text(face="bold",size=12, angle=0,family = 'serif'))
 
@@ -225,8 +236,106 @@ p1 <- p1 + theme(legend.text = element_text(size=12, angle=0,family = 'serif'),
 ```{r severity and incidence in time plot}
 
  plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
-ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure2.png",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure2_new.jpg",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
 
 ```
+```{r df_for_barplot plots}
 
+df1 <- na.omit(df)
+
+ 
+sev <- c(df1$Sev_0dph , df1$Sev_21dph)
+inc <- c(df1$Inc_0dph , df1$Inc_21dph)
+
+farm <- c(df1$Farm , df1$Farm)
+time <-factor(c(rep("0dph",length(sev)/2) , rep("21dph",length(sev)/2)))
+harvest <- c(df1$Harvest , df1$Harvest)
+
+mat <- data.frame(Farm = farm, Time = time , Harvest = harvest, Severity = sev , Incidence = inc)
+
+mat_mean<-tapply(mat$Severity , list(mat$Time,mat$Harvest,mat$Farm),mean)
+mat_mean1<-tapply(mat$Incidence , list(mat$Time,mat$Harvest,mat$Farm),mean)
+mat_se<-tapply(mat$Severity , list(mat$Time,mat$Harvest,mat$Farm),sd)/sqrt(table(mat$Time,mat$Harvest,mat$Farm))
+mat_se1<-tapply(mat$Incidence , list(mat$Time,mat$Harvest,mat$Farm),sd)/sqrt(table(mat$Time,mat$Harvest,mat$Farm))
+n <- table(mat$Time,mat$Harvest,mat$Farm)
+
+mat1<-data.frame(Farm = c(rep("Escondida" , 8) , rep("Sinai" , 8)), Time = rep(c(rep("0dph",4) , rep("21dph",4)) , 2) ,
+                 Harvest = rep(c("2019_m" , "2020_m" , "2020_t" , "2021_t") , 4), 
+                 Severity = c(mat_mean[1,,1] , mat_mean[2,,1] , mat_mean[1,,2] , mat_mean[2,,2]),
+                 Severity_se = c(mat_se[1,,1] , mat_se[2,,1] , mat_se[1,,2] , mat_se[2,,2]),
+                 Incidence = c(mat_mean1[1,,1] , mat_mean1[2,,1] , mat_mean1[1,,2] , mat_mean1[2,,2]),
+                 Incidence_se = c(mat_se1[1,,1] , mat_se1[2,,1] , mat_se1[1,,2] , mat_se1[2,,2]))
+
+
+head(mat1)
+
+```
+* The barplot showing the increase in the severity of lenticel damage during the cold storage. The bars and error bars represent the severity mean and standard deviation observed in the farms at the two evaluations (0 dph and 21 dph), and the points represent the severity mean for the harvest in the farm.
+
+```{r severity in time}
+
+data_hline <- data.frame(Farm = c(rep("Escondida",4),rep( "Sinai",4)),
+                         x = c(0.7,1.7,2.7,3.7,0.7,1.7,2.7,3.7), y = c(1.2, 2.4,0.9,4.7,2.8,4.6,5.4,3.6),xend = c(1.3,2.3,3.3,4.3,1.3,2.3,3.3,4.3), yend = c(1.2, 2.4,0.9,4.7,2.8,4.6,5.4,3.6), label = rep("*",8))
+
+p <-  ggplot(mat1, aes(x = factor(Harvest, levels = c("2019_m" , "2020_t" , "2020_m" , "2021_t")), y = Severity, fill = factor(Time))) + geom_bar(stat="identity", positio=position_dodge())     
+p <- p + scale_fill_manual(values=c("gray90", "gray80"))
+p <- p + geom_errorbar(aes(ymin=Severity-Severity_se, ymax=Severity+Severity_se), width=.2,position=position_dodge(.9)) 
+p <- p + facet_grid(~ Farm) + theme_classic() 
+p <- p +  xlab("") + ylab("Necrotic Area (%)") + labs(fill='Days postharvest') 
+p <- p + theme(axis.title =element_text(size=14,family = 'serif'))
+p <- p +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
+              axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
+p <- p + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+p <- p + theme(legend.text = element_text(size=12, angle=0,family = 'serif'),
+                legend.title = element_text(face="bold",size=12, angle=0,family = 'serif'))
+
+
+
+
+p <- p + geom_segment(data = data_hline,aes(x = x,y = y,xend = xend, yend = yend),inherit.aes = FALSE) 
+p <- p +geom_text(data = data_hline,aes(label = label,x = x+0.3,y = y+0.2),inherit.aes = FALSE)
+
+```
+* The barplot showing the increase in the Incidence of lenticel damage during the cold storage. The bars and error bars represent the incidence mean and standard deviation observed in the farms at the two evaluations (0 dph and 21 dph), and the points represent the severity mean for the harvest in the farm.
+
+```{r incidence in time}
+
+
+p1 <-  ggplot(mat1, aes(x = factor(Harvest, levels = c("2019_m" , "2020_t" , "2020_m" , "2021_t")), y = Incidence, fill = factor(Time))) + geom_bar(stat="identity", positio=position_dodge())     
+p1 <- p1 + scale_fill_manual(values=c("gray90", "gray80"))
+p1 <- p1 + geom_errorbar(aes(ymin=Incidence-Incidence_se, ymax=Incidence+Incidence_se), width=.2,position=position_dodge(.9)) 
+p1 <- p1 + facet_wrap(~ Farm) + theme_classic() 
+p1 <- p1 +  xlab("Harvest") + ylab("Number of necrotic spots") + labs(fill='Days postharvest') 
+p1 <- p1 + theme(axis.title =element_text(size=14,family = 'serif'))
+p1 <- p1 +  theme(axis.text.x = element_text(face="bold",size=12, angle=0,family = 'serif'),
+              axis.text.y = element_text(face="bold",size=12, angle=0,family = 'serif'))
+p1 <- p1 + theme(strip.text.x = element_text(size = 14,family = 'serif'))
+p1 <- p1 + scale_color_manual(name = "Harvest", values =  c("gray88","gray70","gray47","gray0"))
+p1 <- p1 + theme(legend.text = element_text(size=12, angle=0,family = 'serif'),
+                legend.title = element_text(face="bold",size=12, angle=0,family = 'serif'))
+
+data_hline <- data.frame(Farm = c(rep("Escondida",4),rep( "Sinai",4)),
+                         x = c(0.7,1.7,2.7,3.7,0.7,1.7,2.7,3.7), y = c(88, 165,70,203,238,217,256,187),xend = c(1.3,2.3,3.3,4.3,1.3,2.3,3.3,4.3), yend = c(88, 165,70,203,238,217,256,187), label = rep("*",8))
+
+
+
+p1 <- p1 + geom_segment(data = data_hline,aes(x = x,y = y,xend = xend, yend = yend),inherit.aes = FALSE) 
+p1 <- p1 + geom_text(data = data_hline,aes(label = label,x = x+0.3,y = y+5),inherit.aes = FALSE)
+p1
+
+
+
+
+
+
+
+```
+*Fig 2.* Lenticel damage for avocado cv. Hass fruits collected from the La Escondida and El Sinai farms between 2019 and 2021 at harvest time (0 days post-harvest, 0 dph) and after 21 days of storage at 6C (21 days post-harvest, 21 dph). Shown are the means and standard errors for the severity (A) and incidence (B) of the damage for the two evaluatin points (0 dph and 21 dph). The * denotes statistical differences at a 95% confidence level according to the  generalized linear mixed models, and the letter after the year denotes main (m) and traviesa (t) harvest.
+
+```{r severity and incidence in time plot}
+
+ plot<-grid.arrange(p + labs(tag = 'A'),p1 + labs(tag = 'B'), ncol=1,nrow=2)
+ggsave("C:/Users/Dru/Desktop/Cartama_paper/Figure1_new.jpg",plot=plot,dpi = 300,width = 7,height = 7,units = c("in"))
+
+```
 

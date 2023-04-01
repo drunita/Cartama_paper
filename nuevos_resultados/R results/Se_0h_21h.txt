@@ -1,0 +1,42 @@
+ Family: beta  ( logit )
+Formula:          y ~ time * h * farm + (1 | f)
+Zero inflation:     ~1
+
+     AIC      BIC   logLik deviance df.resid 
+-22438.1 -22323.0  11238.0 -22476.1     3127 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ f      (Intercept) 0.2586   0.5085  
+Number of obs: 3146, groups:  f, 1573
+
+Dispersion parameter for beta family ():  349 
+
+Conditional model:
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                 -6.19447    0.07581  -81.71  < 2e-16 ***
+time21dpc                    1.39334    0.07573   18.40  < 2e-16 ***
+h2020_m                      0.55598    0.09275    5.99 2.04e-09 ***
+h2020_t                      1.40684    0.08977   15.67  < 2e-16 ***
+h2021_t                      0.45228    0.10443    4.33 1.48e-05 ***
+farmSinai                    0.67176    0.10073    6.67 2.57e-11 ***
+time21dpc:h2020_m           -0.94487    0.09619   -9.82  < 2e-16 ***
+time21dpc:h2020_t           -0.60292    0.08731   -6.91 5.01e-12 ***
+time21dpc:h2021_t            1.12539    0.09870   11.40  < 2e-16 ***
+time21dpc:farmSinai          0.29466    0.09706    3.04   0.0024 ** 
+h2020_m:farmSinai           -1.08368    0.13318   -8.14 4.05e-16 ***
+h2020_t:farmSinai           -0.06897    0.12384   -0.56   0.5776    
+h2021_t:farmSinai            0.73668    0.13260    5.56 2.77e-08 ***
+time21dpc:h2020_m:farmSinai  2.21397    0.12901   17.16  < 2e-16 ***
+time21dpc:h2020_t:farmSinai -0.09837    0.11364   -0.87   0.3867    
+time21dpc:h2021_t:farmSinai -1.97841    0.12185  -16.24  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Zero-inflation model:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -4.7875     0.1969  -24.31   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

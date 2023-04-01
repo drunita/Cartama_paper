@@ -1,0 +1,5 @@
+               Escondida_Leve Escondida_Severo Sinai_Leve Sinai_Severo
+< 3% abundance      0.6529785        0.7638428  0.6251013    0.4755801
+Ascomycota         15.3349275        6.2720810  8.1080207   13.0696085
+Basidiomycota      12.8505253        5.0441055  6.4701365    4.9053712
+Unclassified       18.1075261       14.5312410  7.0000000   18.6915056

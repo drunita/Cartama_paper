@@ -1,0 +1,12 @@
+                    Escondida_Leve Escondida_Severo Sinai_Leve Sinai_Severo
+Cystobasidiomycetes        6.52500         5.900000  12.100000           NA
+Dothideomycetes           12.43333        32.733333  14.133333     20.63333
+Eurotiomycetes             5.96000         6.100000         NA      5.12500
+Exobasidiomycetes          6.72500         7.333333   5.650000           NA
+Lecanoromycetes            6.62500         6.780000         NA           NA
+Leotiomycetes             12.63333        15.500000   6.733333           NA
+Not classified            21.79167        20.200000  21.908333     28.96667
+Sordariomycetes                 NA         4.100000   4.600000      3.60000
+Spiculogloeomycetes             NA               NA  10.566667      7.20000
+Taphrinomycetes            8.10000         4.500000         NA           NA
+Tremellomycetes           12.73333         4.500000   7.600000      6.90000

@@ -1,0 +1,4 @@
+               Escondida_Leve Escondida_Severo Sinai_Leve Sinai_Severo
+Ascomycota           38.71667         58.60000   27.31667     48.13333
+Basidiomycota        23.83333         13.36000   34.60000     12.53333
+Not classified       37.43333         29.81667   38.11667     39.33333

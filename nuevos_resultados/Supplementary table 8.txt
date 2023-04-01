@@ -1,0 +1,20 @@
+				
+Taxa	Escondida		Sinai	
+	Mild	Severe	Mild	Severe
+	Relative abundance (mean ± SD)			
+Phylum				
+Ascomycota	38.7 ± 15.4	58.6 ± 6.1	27.3 ± 8.1	48.1 ± 13.1
+Basidiomycota	23.8 ± 12.9	13.4 ± 5	34.6 ± 6.4	12.5 ± 4.8
+Not classified	37.4 ± 11.6	29.8 ± 11.2	38.1 ± 6.8	39.3 ± 14.9
+Class				
+Cystobasidiomycetes	6.5 ± 2.1	5.9 ± 1	12.1 ± 4.7	0 ± 0
+Dothideomycetes	12.4 ± 6.3	32.7 ± 11.5	14.1 ± 7.2	20.6 ± 2.8
+Eurotiomycetes	6 ± 2.9	6.1 ± 2.4	0 ± 0	5.1 ± 2
+Exobasidiomycetes	6.7 ± 5	7.3 ± 1	5.7 ± 0.8	0 ± 0
+Lecanoromycetes	6.6 ± 2.1	6.8 ± 2.5	0 ± 0	0 ± 0
+Leotiomycetes	12.6 ± 12.1	15.5 ± 0	6.7 ± 3.9	0 ± 0
+Sordariomycetes	0 ± 0	4.1 ± 0.9	4.6 ± 0	3.6 ± 0.4
+Spiculogloeomycetes	0 ± 0	0 ± 0	10.6 ± 6.1	7.2 ± 3.4
+Taphrinomycetes	8.1 ± 0	4.5 ± 0	0 ± 0	0 ± 0
+Tremellomycetes	12.7 ± 8.9	4.5 ± 0.4	7.6 ± 3.9	6.9 ± 3
+Not classified	21.8 ± 18.2	20.2 ± 13.9	21.9 ± 17.6	29 ± 17.1

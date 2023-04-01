@@ -1,0 +1,40 @@
+ Family: nbinom2  ( log )
+Formula:          y ~ time * h * farm + (1 | f)
+Zero inflation:     ~1
+
+     AIC      BIC   logLik deviance df.resid 
+    8224     8339    -4093     8186     3127 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ f      (Intercept) 0.1423   0.3772  
+Number of obs: 3146, groups:  f, 1573
+
+Dispersion parameter for nbinom2 family (): 3.91e+07 
+
+Conditional model:
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                  -2.8256     0.2901  -9.739  < 2e-16 ***
+time21dpc                     2.6391     0.2988   8.832  < 2e-16 ***
+h2020_m                       1.0871     0.3256   3.338 0.000843 ***
+h2020_t                       2.6694     0.2998   8.905  < 2e-16 ***
+h2021_t                       1.3535     0.3349   4.041 5.31e-05 ***
+farmSinai                     1.8718     0.3166   5.912 3.38e-09 ***
+time21dpc:h2020_m            -1.6217     0.3439  -4.716 2.41e-06 ***
+time21dpc:h2020_t            -1.8077     0.3106  -5.819 5.91e-09 ***
+time21dpc:h2021_t             0.2208     0.3433   0.643 0.520074    
+time21dpc:farmSinai          -0.8473     0.3271  -2.591 0.009578 ** 
+h2020_m:farmSinai            -2.5529     0.4129  -6.184 6.27e-10 ***
+h2020_t:farmSinai            -1.2586     0.3326  -3.784 0.000154 ***
+h2021_t:farmSinai            -0.1050     0.3632  -0.289 0.772423    
+time21dpc:h2020_m:farmSinai   3.7866     0.4295   8.817  < 2e-16 ***
+time21dpc:h2020_t:farmSinai   0.9359     0.3455   2.709 0.006752 ** 
+time21dpc:h2021_t:farmSinai  -1.1914     0.3740  -3.186 0.001444 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Zero-inflation model:
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept)   -18.12     251.54  -0.072    0.943

@@ -1,0 +1,35 @@
+ Family: beta  ( logit )
+Formula:          y ~ farm * year + (1 | fp) + (1 | fpt)
+Zero inflation:     ~1
+
+     AIC      BIC   logLik deviance df.resid 
+-16573.7 -16506.2   8298.8 -16597.7     2024 
+
+Random effects:
+
+Conditional model:
+ Groups Name        Variance Std.Dev.
+ fp     (Intercept) 0.02023  0.1422  
+ fpt    (Intercept) 0.04139  0.2034  
+Number of obs: 2036, groups:  fp, 13; fpt, 70
+
+Dispersion parameter for beta family ():  241 
+
+Conditional model:
+                     Estimate Std. Error z value Pr(>|z|)    
+(Intercept)          -6.00263    0.09591  -62.59  < 2e-16 ***
+farmSinai             0.59137    0.12374    4.78 1.76e-06 ***
+year2020_m            0.51902    0.07489    6.93 4.19e-12 ***
+year2020_t            1.31033    0.06982   18.77  < 2e-16 ***
+year2021_t            0.48023    0.09979    4.81 1.49e-06 ***
+farmSinai:year2020_m -0.94009    0.10229   -9.19  < 2e-16 ***
+farmSinai:year2020_t -0.03222    0.08837   -0.36    0.715    
+farmSinai:year2021_t  0.63195    0.11583    5.46 4.88e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Zero-inflation model:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -4.0174     0.1682  -23.89   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

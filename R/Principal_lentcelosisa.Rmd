@@ -1,0 +1,325 @@
+---
+title: "Principal_analysis_lenticelosis"
+author: "dru"
+output: html_document
+date: "2022-08-16"
+---
+
+## Preparing the environment
+
+Loading required Packages
+
+```{r Packages, echo=TRUE, message=FALSE, warning=FALSE}
+
+library(glmmTMB)
+library(bbmle)
+library(DHARMa)
+library(readxl)
+library(tidyverse)
+
+```
+
+## Loading and inspecting the data
+
+Loading and inspecting the file 'Lenticel_Damage_Summary_All_Harvest.xlsx'. This file has two-years of lenticel damage measurements recorded in two avocado farms across four harvest.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+Lenticel_file <- read_excel("C:/Users/Dru/Desktop/Cartama_paper/files/Lenticel_Damage_Summary_All_Harvest.xlsx")
+glimpse(Lenticel_file)
+```
+
+Checking for NA, miss speels and anomalies in the data:
+
+```{r inspecting}
+
+table(Lenticel_file$Cosecha)
+table(Lenticel_file$UP)
+
+f <-subset(Lenticel_file,Lenticel_file$UP=="Escondida")
+f1 <- subset(Lenticel_file,Lenticel_file$UP=="Sinai")
+table(f$Lote)
+table(f$Arbol)
+table(f1$Lote)
+table(f1$Arbol)
+summary(Lenticel_file$Severidad_0)
+summary(Lenticel_file$Severidad_1)
+summary(Lenticel_file$Incidencia_0)
+summary(Lenticel_file$Incidencia_1)
+```
+
+Problems:
+
+* Some tree numbers are shared between La Escondida y El Sinai, and this redundancy can result in problems during the analysis.
+* Lenticel damage columns have several NA. Fruits having NA the severidad_0 or incidence_0 were removed from all the analyses, and those having NA in severidad_1 or incidence_1 only from the analysis evaluating disease progresion
+
+
+
+## Cleaning and preparing the data
+### cleaning actions:
+
+* The columns cosecha, Año, Severidad_pedunculo, arbol and the last three empty columns were removed as they are not used during the analysis
+* The 'p' simbol in the column Cosecha is changed for 'm' to especify the main harvest.
+* Generated a column Tree which has the name of the tree indicated by the farm and tree number (i.e., Sinai15) to avoid problems during the analysis
+
+```{r cleaning}
+Lenticel_file$...13<-NULL
+Lenticel_file$...14<-NULL
+Lenticel_file$...15<-NULL
+Lenticel_file$Año<-NULL
+Lenticel_file$cosecha<-NULL
+Lenticel_file$Severidad_pedunculo<-NULL
+Lenticel_file[Lenticel_file=="2019_p"]<-"2019_m"
+Lenticel_file[Lenticel_file=="2020_p"]<-"2020_m"
+Lenticel_file$Tree<-paste(Lenticel_file$UP,Lenticel_file$Arbol,sep="")
+Lenticel_file$Arbol<-NULL
+
+df <- Lenticel_file %>% drop_na(Severidad_0 , Incidencia_0)
+colnames(df)[which(names(df) == "Cosecha")] <- "Harvest"
+colnames(df)[which(names(df) == "UP")] <- "Farm"
+colnames(df)[which(names(df) == "Lote")] <- "Plot"
+colnames(df)[which(names(df) == "Fruta")] <- "Fruit"
+colnames(df)[which(names(df) == "Severidad_0")] <- "Sev_0dph"
+colnames(df)[which(names(df) == "Severidad_1")] <- "Sev_21dph"
+colnames(df)[which(names(df) == "Incidencia_0")] <- "Inc_0dph"
+colnames(df)[which(names(df) == "Incidencia_1")] <- "Inc_21dph"
+df$Inc_ratio <- df$Inc_21dph-df$Inc_0dph
+df$Sev_ratio <- df$Sev_21dph-df$Sev_0dph
+glimpse(df)
+summary(df$Sev_0dph)
+
+
+
+#Datos_mat<-subset(Datos_mat,Datos_mat$Cosecha!="2020_t")
+
+
+plot<-factor(df$Plot)
+tree<-factor(df$Tree)
+farm<-factor(df$Farm)
+fpt<-farm:plot:tree
+fp<-farm:plot
+pt<- plot:tree
+year<-factor(df$Harvest)
+fruta<-factor(df$Fruit)
+```
+# 0dph annalysis for the severity and Incidence
+## Building the severity models
+We are using zero-inflated generalized linear mixed models for assessing differences in severity between farms and harvests. We are using glmmTMB function of the glmmTMB package with the beta family().
+https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf
+
+```{r}
+
+
+y<-df$Sev_0dph/100
+
+modelo <- glmmTMB(y~farm*year +  (1|fp) + (1|fpt),ziformula=~1,family=beta_family())
+
+modelo1 <- glmmTMB(y~farm*year + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=beta_family())
+#modelo1 <- glmmTMB(y~farm+year + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=beta_family())
+#modelo2 <- glmmTMB(y~year + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=beta_family())
+#modelo3 <- glmmTMB(y~farm + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=beta_family())
+
+```
+## Testing the model
+Testing the good-of-fit of the model with the DHARMA library
+https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+
+We used AIC model selection to distinguish among a set of possible models describing the relationship between farm and harvest and severity. The best-fit model, carrying 100% of the cumulative model weight, included every parameter with the interaction effects.
+https://www.scribbr.com/statistics/akaike-information-criterion/#:~:text=The%20Akaike%20information%20criterion%20(AIC,best%20fit%20for%20the%20data.
+
+```{r}
+
+#AICtab(modelo,modelo1,modelo2,modelo3, base=TRUE,weights = TRUE)
+
+residual_simulation<-simulateResiduals(modelo)
+plot(residual_simulation)
+residual_simulation_years <-recalculateResiduals(residual_simulation, group = df$Tree)
+plot(residual_simulation_years)
+testDispersion(residual_simulation)
+testZeroInflation(residual_simulation)
+testCategorical(residual_simulation, catPred = df$Tree)
+par(mfrow = c(1,2))
+plotResiduals(residual_simulation, farm)
+plotResiduals(residual_simulation, year)
+
+sink("Sev_0h.txt")
+print(summary(modelo))
+sink()
+```
+
+## Building the incidence models
+We are using zero-inflated generalized linear mixed models for assessing differences between farms and years.  we are using glmmTMB function of the glmmTMB package with the negative binomial family.
+https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf
+
+```{r}
+
+
+y<-round(df$Inc_0dph)
+
+modelo <- glmmTMB(y~farm*year + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=nbinom2)
+modelo1 <- glmmTMB(y~farm+year + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=nbinom2)
+modelo2 <- glmmTMB(y~year + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=nbinom2)
+modelo3 <- glmmTMB(y~farm + (1|farm) + (1|fp) + (1|fpt),ziformula=~1,family=nbinom2)
+
+```
+## Testing the model
+Testing the model with the DHARMA library
+https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+We selected modelo1 as its better fitted and the AIC penalty is low. We are having issues with no homogen variance between harvest. We also have a small deviation from the expected distributions of the residualas
+
+```{r}
+
+
+AICtab(modelo,modelo1,modelo2,modelo3, base=TRUE)
+
+
+residual_simulation<-simulateResiduals(modelo)
+plot(residual_simulation)
+residual_simulation_years <-recalculateResiduals(residual_simulation, group = df$Tree)
+plot(residual_simulation_years)
+testDispersion(residual_simulation)
+testZeroInflation(residual_simulation)
+#testCategorical(residual_simulation, catPred = df$Tree)
+par(mfrow = c(1,2))
+plotResiduals(residual_simulation, farm)
+plotResiduals(residual_simulation, year)
+
+sink("In_0h.txt")
+print(summary(modelo))
+sink()
+```
+# 21dph annalysis for the severity and Incidence
+## Building the severity models
+We are using zero-inflated generalized linear mixed models for assessing differences in severity between time points (0dph and 21dph) and harvests. These evlauations were mede for each farm separately using glmmTMB function of the glmmTMB package with the beta family().
+https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf
+
+```{r}
+dfe<-na.omit(subset(df,df$Farm=="Escondida"))
+dfs<-na.omit(subset(df,df$Farm=="Sinai"))
+df1<-na.omit(df)
+y<-c(df1$Sev_0dph,df1$Sev_21dph)/100
+ye<-c(dfe$Sev_0dph,dfe$Sev_21dph)/100
+ys<-c(dfs$Sev_0dph,dfs$Sev_21dph)/100
+
+
+time<-factor(c(rep("0dpc",length(y)/2),rep("21dpc",length(y)/2)))
+timee<-factor(c(rep("0dpc",length(ye)/2),rep("21dpc",length(ye)/2)))
+times<-factor(c(rep("0dpc",length(ys)/2),rep("21dpc",length(ys)/2)))
+
+farm<-c(df1$Farm,df1$Farm)
+f<-factor(c(df1$Fruit,df1$Fruit))
+h<-factor(c(df1$Harvest,df1$Harvest))
+
+fe<-factor(c(dfe$Fruit,dfe$Fruit))
+he<-factor(c(dfe$Harvest,dfe$Harvest))
+fs<-factor(c(dfs$Fruit,dfs$Fruit))
+hs<-factor(c(dfs$Harvest,dfs$Harvest))
+
+modelo <- glmmTMB(y ~ time * h *farm + (1|f)  ,ziformula= ~ 1,family=beta_family())
+modelos <- glmmTMB(ys ~ times * hs + (1|fs) ,ziformula= ~ 1,family=beta_family())
+modeloe <- glmmTMB(ye ~ timee * he + (1|fe) ,ziformula= ~ he + timee,family=beta_family())
+```
+## Testing the model
+Testing the model with the DHARMA library
+https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+We selected modelos and modeloe
+
+```{r}
+#modelo <- glmmTMB(y ~ time * h *farm + (1|f)  ,ziformula= ~ 1,family=beta_family())
+#modelo1 <-glmmTMB(y ~ time * h +farm + (1|f)  ,ziformula= ~ 1,family=beta_family()) 
+#modelo2 <- glmmTMB(y ~ time + h *farm + (1|f)  ,ziformula= ~ 1,family=beta_family())
+#modelo3 <- glmmTMB(y ~ time + h +farm + (1|f)  ,ziformula= ~ 1,family=beta_family())
+
+
+AICtab(modelo,modelo1,modelo2,modelo3, base=TRUE,weights = TRUE)
+
+residual_simulation<-simulateResiduals(modelo)
+plot(residual_simulation)
+testDispersion(residual_simulation)
+testZeroInflation(residual_simulation)
+par(mfrow = c(1,2))
+plotResiduals(residual_simulation, h)
+
+
+
+```
+```{r}
+dfe<-na.omit(subset(df,df$Farm=="Escondida"))
+dfs<-na.omit(subset(df,df$Farm=="Sinai"))
+df1<-na.omit(df)
+y<-round(c(df1$Sev_0dph,df1$Sev_21dph))
+ye<-round(c(dfe$Inc_0dph,dfe$Inc_21dph))
+ys<-round(c(dfs$Inc_0dph,dfs$Inc_21dph))
+
+
+time<-factor(c(rep("0dpc",length(y)/2),rep("21dpc",length(y)/2)))
+timee<-factor(c(rep("0dpc",length(ye)/2),rep("21dpc",length(ye)/2)))
+times<-factor(c(rep("0dpc",length(ys)/2),rep("21dpc",length(ys)/2)))
+
+farm<-c(df1$Farm,df1$Farm)
+f<-factor(c(df1$Fruit,df1$Fruit))
+h<-factor(c(df1$Harvest,df1$Harvest))
+
+fe<-factor(c(dfe$Fruit,dfe$Fruit))
+he<-factor(c(dfe$Harvest,dfe$Harvest))
+fs<-factor(c(dfs$Fruit,dfs$Fruit))
+hs<-factor(c(dfs$Harvest,dfs$Harvest))
+
+#modelo <- glmmTMB(y ~ time * h *farm + (1|f)  ,ziformula= ~ 1,family=beta_family())
+modelo <- glmmTMB(y ~ time * h *farm + (1|f)  ,ziformula= ~ 1,family=nbinom2)
+modelo1 <-glmmTMB(y ~ time * h +farm + (1|f)  ,ziformula= ~ 1,family=nbinom2) 
+modelo2 <- glmmTMB(y ~ time + h *farm + (1|f)  ,ziformula= ~ 1,family=nbinom2)
+modelo3 <- glmmTMB(y ~ time + h +farm + (1|f)  ,ziformula= ~ 1,family=nbinom2)
+
+#modeloe <- glmmTMB(ye ~ timee * he + (1|fe) ,ziformula= ~ 1 + timee,family=nbinom2)
+```
+## Testing the model
+Testing the model with the DHARMA library
+https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+We selected modelos and modeloe
+
+```{r}
+AICtab(modelo,modelo1,modelo2,modelo3, base=TRUE)
+#modelos <- glmmTMB(ys ~ times * hs + (1|fs) ,ziformula= ~ 1,family=nbinom2)
+
+residual_simulation<-simulateResiduals(modelo)
+plot(residual_simulation)
+testDispersion(residual_simulation)
+testZeroInflation(residual_simulation)
+plotResiduals(residual_simulation, h)
+
+sink("In_0h_21h.txt")
+print(summary(modelo))
+sink()
+
+```
+
+
+
+```{r}
+
+
+df1<-na.omit(df)
+
+
+mat1<-data.frame(Farm =c(df1$Farm,df1$Farm), Time = factor(c(rep("0dpc",length(y)/2),rep("21dpc",length(y)/2))), 
+                 Harvest = factor(c(df1$Harvest,df1$Harvest)), Severity = c(df1$Sev_0dph,df1$Sev_21dph)/100,
+                 Incidence = round(c(df1$Inc_0dph,df1$Inc_0dph)), Fruit = c(df1$Fruit,df1$Fruit))
+
+
+mat2 <-subset(mat1, mat1$Farm== "Sinai" & mat1$Harvest == "2020_m")
+modelo <- glmmTMB(data=mat2, Severity ~ Time + (1|Fruit)  ,ziformula= ~ 1,family=beta_family())
+residual_simulation<-simulateResiduals(modelo)
+plot(residual_simulation)
+testDispersion(residual_simulation)
+summary(modelo)
+modelo1 <- glmmTMB(data=mat2, Incidence ~ Time + (1|Fruit)  ,ziformula= ~ 1,family=poisson())
+#modelo1 <- glmmTMB(data=mat2, Incidence ~ Time + (1|Fruit)  ,ziformula= ~ 1,family=nbinom2())
+residual_simulation<-simulateResiduals(modelo1)
+plot(residual_simulation)
+testDispersion(residual_simulation)
+summary(modelo1)
+
+```
+
+
+
